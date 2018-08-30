@@ -1,23 +1,23 @@
 Title         : README
-Logo          : False
 
-[TITLE]
+author        : hjk
+
 
 # OptiX封装
 ## Files
 * Head Files
-    * [optix_basic.h][#sec-optix_basich]
-    * [optix_base_datastruct.h][#sec-optix_base_datastructh]
-    * [optix_geometry.h][#sec-optix_geometryh]
-    * [optix_geometry_instance.h][#sec-optix_geometry_instanceh]
-    * [optix_material_manager.h][#sec-optix_material_managerh]
-    * [optix_shader.h][#sec-optix_shaderh]
-    * [optix_texture.h][#sec-optix_textureh]
-    * [optix_scene_manager.h][#sec-optix_scene_managerh]
-    * [optix_engine.h][#sec-optix_engineh]
+    * [optix_basic.h](#optix_basic.h)
+    * [optix_basic_ds.h](#optix_basic_ds.h)
+    * [optix_geometry.h](#optix_geometry.h)
+    * [optix_geometry_instance.h](#optix_geometry_instance.h)
+    * [optix_material_manager.h](#optix_material_manager.h)
+    * [optix_shader.h](#optix_shader.h)
+    * [optix_texture.h](#optix_texture.h)
+    * [optix_scene_manager.h](#optix_scene_manager.h)
+    * [optix_engine.h](#optix_engine.h)
 * Source Files
     * optix_basic.cpp
-    * optix_base_datastruct.cpp
+    * optix_basic_ds.cpp
     * optix_geometry.cpp
     * optix_geometry_instance.cpp
     * optix_material_manager.cpp
@@ -27,13 +27,88 @@ Logo          : False
     * optix_engine.cpp
 
 ## Class
+<a name="optix_basic.h"></a>
 ### optix_basic.h
-### optix_base_datastruct.h
+
+[class OptixTexture2DResample;](#OptixTexture2DResample)
+
+***用以渲染结果到纹理的一个历史遗留类，未改动，可以无视***
+
+[class OptixTexture2DResample;](#OptixTexture2DResample)
+
+***该类申请所需的optix基本资源，并在整个应用的生命周期中保持持有***
+
+
+
+<a name="optix_basic_ds.h"></a>
+### optix_basic_ds.h
+
+[class GeometryBuffersInGPU;](#GeometryBuffersInGPU)
+
+***在GPU中几何buffer的集合，析构时会自动释放资源***
+
+[class GeometryBuffersInMemory;](#GeometryBuffersInMemory)
+
+***在内存中几何buffer的集合，析构时会自动释放资源***
+
+[class SamplePoints;](#SamplePoints)
+
+***采样点的集合***
+
+
+<a name="optix_geometry.h"></a>
 ### optix_geometry.h
+
+[class OptixGeomerty;](#OptixGeomerty)
+
+***对应OptiX中的geometry，在构造时会自动添加对三角网格几何结构的支持***
+
+
+<a name="optix_geometry_instance.h"></a>
 ### optix_geometry_instance.h
+
+[class OptixGeometryInstance;](#OptixGeometryInstance)
+
+***对应OptiX中的geometryInstance，在构造时需要指定是否是光源，所有与实体相关的数据请通过 operator[] 访问器挂在该对象上***
+
+
+<a name="optix_material_manager.h"></a>
 ### optix_material_manager.h
+
+[class OptixMaterialManager;](#OptixMaterialManager)
+
+***材质管理器，目前提供普通(Normal)以及光源(Light)两种材质，请通过扩展该类来增加更多材料(半透明等)***
+
+
+<a name="optix_shader.h"></a>
 ### optix_shader.h
+
+[class OptixProgram;](#OptixProgram)
+
+***对应OptiX中的program，请勿直接使用该类，而是通过 OptixProgramManager 代为管理***
+
+[class OptixProgramManager;](#OptixProgramManager)
+
+***管理所有program对象，所有CU文件请放置于 cuFiles 文件夹下，并通过文件名来获取***
+
+
+<a name="optix_texture.h"></a>
 ### optix_texture.h
+
+***该文件基本未作改动，请参考原文档***
+
+
+<a name="optix_scene_manager.h"></a>
 ### optix_scene_manager.h
+
+[class OptixObject;](#OptixObject)
+
+***该类为实际场景中的逻辑最小单位，拥有在OptiX模块中的唯一ID和从DX模块中传入的ID***
+
+
+<a name="optix_engine.h"></a> 
 ### optix_engine.h
+
+
+
 

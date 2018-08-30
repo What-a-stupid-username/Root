@@ -121,12 +121,6 @@ author        : hjk
 
 ***烘焙任务对象，通过调用 OptixEngine::StartBakingTask(BakingTask,RayNum)在GPU上开启一个烘焙任务***
 
-
-[class BakingTask;](#BakingTask)
-
-***烘焙任务对象，通过调用 OptixEngine::StartBakingTask(BakingTask,RayNum)在GPU上开启一个烘焙任务***
-
-
 [class OptixEngine;](#OptixEngine)
 
 ***OptiX模块与其他部分的界面***
@@ -302,7 +296,7 @@ OptixEngine::
 
 # RayTracing
 
-根据物体体积和网格精细程度(面片数)调整贴图大小。在烘焙时，来自光源直射的辐射贡献最大，故先对光源进行有先验的采样，以提高质量。此外，按辐射度理论对周围物体进行蒙特卡洛重要性采样。在这一过程中同时计算来自环境光的辐射和来自物体的辐射。在采样来自物体的间接辐射时，按照射线落空的概率来估计物体间接辐射随空间分布的pdf，并进行重要性采样。此外，在计算物体间接辐强度时，由于其对最终结果的贡献小，所以减小采样数量。对于不同的物体，同一类型全部共用同一个geometry和material节点，而仅仅在geometry buffer和texture sampler中做出区别，提高了复用性和效率。采用NVIDIA的DeepLearningDenoiser极大程度上减少了结果噪点。
+根据物体体积和网格精细程度(面片数)调整贴图大小。在烘焙时，来自光源直射的辐射贡献最大，故先对光源进行有先验的采样，以提高质量。此外，按辐射度理论对周围空间进行蒙特卡洛重要性采样。在这一过程中同时计算来自环境光的辐射和来自物体的辐射。在采样来自物体的间接辐射时，按照射线落空的概率来估计物体间接辐射随空间分布的pdf，并进行重要性采样。此外，在计算物体间接辐强度时，由于其对最终结果的贡献小，所以减小采样数量。对于不同的物体，同一类型全部共用同一个geometry和material节点，而仅仅在geometry buffer和texture sampler中做出区别，提高了复用性和效率。采用NVIDIA的DeepLearningDenoiser极大程度上减少了结果噪点。
 
 #  Extension
 
@@ -320,6 +314,6 @@ OptixEngine::
 
 # UserInterface
 
-![ui]("./ui.png")
+![ui](./ui.png)
 
 使用QT4.7.0生成

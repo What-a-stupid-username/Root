@@ -101,7 +101,7 @@ author        : hjk
 <a name="optix_scene_manager.h"></a>
 ### optix_scene_manager.h
 
-[class OptixObject;](#OptixObject)
+[class OptixObject : public OptixGeometryInstance;](#OptixObject)
 
 ***该类为实际场景中的逻辑最小单位，拥有在OptiX模块中的唯一ID和从DX模块中传入的ID***
 
@@ -133,11 +133,193 @@ author        : hjk
 
 
 ## Functions
+仅列出重要函数
 
 <a name="GeometryBuffersInMemory"></a>
 ```cpp
 GeometryBuffersInMemory::
-		uint32_t GetTriangleNum() const;
-		uint32_t GetVertexNum() const;
+    //获得该buffer集合中包含的三角形个数
+    uint32_t GetTriangleNum() const;
+    //获得该buffer集合中包含的顶点个数
+    uint32_t GetVertexNum() const;
+    
 ```
 
+<a name="OptixGeomerty"></a>
+```cpp
+OptixGeomerty::
+    //设置网格三角形个数
+    uint32_t SetTriangleNum() const;
+    
+```
+
+<a name="OptixGeometryInstance"></a>
+```cpp
+OptixGeometryInstance::
+    //构造函数，须指定是否为光源，仅分配必须资源
+    OptixGeometryInstance(bool isLight = false);
+    //调用该函数来完成资源分配并初始化
+    EngineFailReason Create(PointCommon *point_in, uint32_t *index_in, uint32_t vertex_num,	uint32_t index_num);
+    //调用Upload来将内存中的Buffer送至GPU
+    EngineFailReason Upload();
+    //调用Unload来卸载GPU中buffer
+    EngineFailReason Unload();
+    //调用Release来释放除基本资源外的所有资源，注意基本资源将被持有直到析构。
+    Release();
+    //使用该访问器来绑定变量到物体实例
+    optix::Handle<optix::VariableObj> operator[](const std::string& varname);
+    //获取内存中的几何信息buffer备份
+    GeometryBuffersInMemory& GetBuffersInMemory();
+    //获取底层optix::GeometryInstance
+    optix::GeometryInstance	GetGeometryInstance();
+    //获取包围盒
+    const optix::Aabb GetAABB() const;
+    
+```
+
+<a name="OptixProgram"></a>
+```cpp
+OptixProgram::
+    //获得optix::Program
+    optix::Program GetData()
+    
+```
+
+<a name="OptixProgramManager"></a>
+```cpp
+OptixProgramManager::
+    //通过名字获得一个OptixProgram
+    OptixProgram* GetProgramByName(std::string file_name, std::string program_name);
+    
+```
+
+<a name="OptixMaterialManager"></a>
+```cpp
+OptixMaterialManager::
+    //为GeomtryInstance添加普通材料
+    void AddNormalMaterial(optix::GeometryInstance& geo);
+    //为GeomtryInstance添加灯光材料
+    void AddLightMaterial(optix::GeometryInstance& geo);
+    
+```
+
+<a name="OptixChunk"></a>
+```cpp
+OptixChunk::
+    //添加一个子物体
+    void AddChild(OptixObject* object);
+    //卸载所有GPU资源，但保留内存备份
+    void Unload();
+    //重新传送内存备份到GPU
+    void Upload();
+    //删除所有子物体资源，包括GPU部分和内存部分。
+    void ReleaseChildren();
+    
+```
+
+<a name="OptixSceneManager"></a>
+```cpp
+OptixSceneManager::
+    //向某地块中添加物体
+    void AddObjectToScene(OptixObject* object, uint32_t x = 0, uint32_t y = 0);
+    //查找某物体
+    OptixObject* FindObjectInScene(uint64_t id);
+    //从场景中卸载某地块
+    void UnloadChunk(uint32_t x = 0, uint32_t y = 0);
+    //向场景中加载某地块
+    void UploadChunk(uint32_t x = 0, uint32_t y = 0);
+    //清除并释放所有地块的资源，包括其子物体以及其几何资源
+    void RemoveAll();
+    //获得场景包围盒
+    optix::Aabb GetAABB();
+    //获得光源列表
+    const list<uint64_t> GetLightList();
+    
+```
+
+<a name="BakingTask"></a>
+```cpp
+BakingTask::
+    //创建一个烘焙任务
+    BakingTask(OptixObject* object);
+    //计算采样点云，由CPU完成
+    EngineFailReason BuildBakingSamples(uint32_t tex_width, uint32_t tex_height, float sample_quality);
+    //将点云Buffer送至GPU
+    EngineFailReason Upload();
+    //绑定当前任务的Buffer到OptixContext
+    void BindBakingBufferToContext();
+    //释放GPU的采样点云Buffer
+    void Unload();
+    //释放CPU和GPU的采样点云Buffer
+    void Release();    
+    
+```
+
+<a name="OptixEngine"></a>
+```cpp
+OptixEngine::
+    //设置烘焙类型
+    void SetBakingType(BakingType bake_operation_in);
+    //渲染场景到贴图并返回
+    ID3D11Texture2D* RenderToTexture(int width, int height);
+    //从SceneDesign中读取并覆盖当前场景
+    EngineFailReason LoadScene(manul::SceneDesign *scene_directx);
+    //在GPU上开启一个烘焙任务
+    void StartBakingTask(BakingTask* task, uint32_t ray_num);
+    //获取所有待烘焙任务
+    std::vector<BakingTask*> GetTasks();
+    //获取所有贴图文件的名字
+    std::vector<std::string> GetAllFileName();
+    //清除所有额外资源，恢复原始状态
+    void RemoveAll();    
+    
+```
+
+
+
+
+# cuFiles
+
+* bake_texture.cu
+  
+  ***烘焙贴图相关***
+
+* constantbg.cu
+
+  ***背景色，可拓展为天空盒***
+
+* material_shader.cu
+
+  ***包含所有material program***
+
+* realtime_render.cu
+
+  ***包含所有实时预览相机***
+  
+* triangle_mesh.cu
+
+  ***三角形网格intersect program***
+
+# RayTracing
+
+根据物体体积和网格精细程度(面片数)调整贴图大小。在烘焙时，来自光源直射的辐射贡献最大，故先对光源进行有先验的采样，以提高质量。此外，按辐射度理论对周围物体进行蒙特卡洛重要性采样。在这一过程中同时计算来自环境光的辐射和来自物体的辐射。在采样来自物体的间接辐射时，按照射线落空的概率来估计物体间接辐射随空间分布的pdf，并进行重要性采样。此外，在计算物体间接辐强度时，由于其对最终结果的贡献小，所以减小采样数量。对于不同的物体，同一类型全部共用同一个geometry和material节点，而仅仅在geometry buffer和texture sampler中做出区别，提高了复用性和效率。采用NVIDIA的DeepLearningDenoiser极大程度上减少了结果噪点。
+
+#  Extension
+
+1.未能提供对于透明材料的支持。
+
+2.平行光源只能有一个并作为主光源。
+
+3.环境光无法选择来自天空盒。
+
+4.物体diffuse color只来自按uv采样的主贴图，并且不支持顶点色。
+
+5.按物体为单位的粗粒度的中间过程cache并不能明显提高效率，并且增大了显存开销，已经废弃。
+
+6.UI部分与后端的交互写的比较随意
+
+# UserInterface
+
+![ui]("./ui.png")
+
+使用QT4.7.0生成

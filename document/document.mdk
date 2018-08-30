@@ -34,7 +34,7 @@ author        : hjk
 
 ***用以渲染结果到纹理的一个历史遗留类，未改动，可以无视***
 
-[class OptixTexture2DResample;](#OptixTexture2DResample)
+[class OptixBasic;](#OptixBasic)
 
 ***该类申请所需的optix基本资源，并在整个应用的生命周期中保持持有***
 
@@ -105,10 +105,39 @@ author        : hjk
 
 ***该类为实际场景中的逻辑最小单位，拥有在OptiX模块中的唯一ID和从DX模块中传入的ID***
 
+[class OptixChunk;](#OptixChunk)
+
+***地块，请勿直接使用该类而总是通过 OptixSceneManager 来使用地块提供的服务***
+
+[class OptixSceneManager;](#OptixSceneManager)
+
+***OptiX模块的场景管理器，管理全部物体的加载与释放，请拓展该类来实现更多功能***
+
 
 <a name="optix_engine.h"></a> 
 ### optix_engine.h
 
+[class BakingTask;](#BakingTask)
+
+***烘焙任务对象，通过调用 OptixEngine::StartBakingTask(BakingTask,RayNum)在GPU上开启一个烘焙任务***
 
 
+[class BakingTask;](#BakingTask)
+
+***烘焙任务对象，通过调用 OptixEngine::StartBakingTask(BakingTask,RayNum)在GPU上开启一个烘焙任务***
+
+
+[class OptixEngine;](#OptixEngine)
+
+***OptiX模块与其他部分的界面***
+
+
+## Functions
+
+<a name="GeometryBuffersInMemory"></a>
+```cpp
+GeometryBuffersInMemory::
+		uint32_t GetTriangleNum() const;
+		uint32_t GetVertexNum() const;
+```
 
